@@ -1,0 +1,25 @@
+name: Upload Portfolio
+
+on:
+  push:
+    branches:
+      - main   # Make sure your GitHub branch name is 'main'. If it's 'master', change this.
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Sync Files to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --acl public-read --follow-symlinks --delete
+        env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}   # 👈 Set this in GitHub secrets → your bucket name
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}   # 👈 Your AWS Access Key
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}   # 👈 Your AWS Secret Key
+          AWS_REGION: ${{ secrets.AWS_REGION }}   # 👈 Example: ap-south-1 for Mumbai
+          SOURCE_DIR: 'website'   # 👈 This should match your folder name that has index.html (like 'website')
